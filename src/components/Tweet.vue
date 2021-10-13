@@ -1,13 +1,13 @@
 <template>
   <div class="card">
     <div class="card-header bg-white">
-      {{ TweetObj.tweet_user.user_name }}@{{ TweetObj.tweet_user.user_id }}
+      {{ Tweet.tweet_user.user_name }}@{{ TweetObj.tweet_user.user_id }}
     </div>
     <div class="card-body">
-      <div class="card-text">{{ TweetObj.tweet_body }}</div>
+      <div class="card-text">{{ Tweet.tweet_body }}</div>
     </div>
     <div class="card-footer bg-white">
-      <div >
+      <div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="16"
@@ -35,12 +35,17 @@ export default {
   },
   data() {
     return {
+      // 参照渡しするための設定
+      Tweet: this.TweetObj,
       like: 0,
     };
   },
   methods: {
     doCount() {
       this.like++;
+      // 参照渡しをしている
+      this.Tweet.likeCount = this.like
+      console.log(this.Tweet)
     },
   },
 };
