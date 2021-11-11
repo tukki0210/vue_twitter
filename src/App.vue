@@ -1,47 +1,42 @@
 <template>
-<div>
-   <HelloWorld />
-  <div class="wrapper">
-    <div class="menu">
-      <p class="text-success">ユーザーの切り替え</p>
-      <ul class="list-group">
-        <li class="list-group-item" v-on:click="chengeUser"></li>
-      </ul>
-
-    </div>
-    <div class="tweet-contents">
-      <h2 class="text-success">Twitter-Vue3</h2>
-      <div class="content">
-        <Form v-on:tweet-event="tweetAction" />
-        <div style="margin-top:20px">
-          <Tweet
-            v-for="Tweet in AllTweet"
-            v-bind:TweetObj="Tweet"
-            v-bind:key="Tweet.tweet_id"
-          />
+  <div>
+    <HelloWorld title="Composition API" msg="This is Composition API sample" />
+    <div class="wrapper">
+      <SelectUser v-on:selectUser-event="selectUser" />
+      <div class="tweet-contents">
+        <h2 class="text-success">Twitter-Vue3</h2>
+        <div class="content">
+          <Form v-on:tweet-event="tweetAction" v-bind:user="data.tweet_user" />
+          <div style="margin-top: 20px">
+            <Tweet
+              v-for="Tweet in data.AllTweet"
+              v-bind:TweetObj="Tweet"
+              v-bind:key="Tweet.tweet_id"
+            />
+          </div>
         </div>
       </div>
     </div>
-   
-  </div>
   </div>
 </template>
 
 <script>
 import Form from "./components/Form.vue";
 import Tweet from "./components/Tweet.vue";
-
+import SelectUser from "./components/SelectUser.vue";
 import HelloWorld from "./components/HelloWorld.vue";
+import { reactive } from '@vue/reactivity';
 
 export default {
   name: "App",
   components: {
     Form,
     Tweet,
-    HelloWorld,
+    SelectUser,
+    HelloWorld
   },
-  data() {
-    return {
+  setup(){
+    const data = reactive({
       AllTweet: Array.of({
         tweet_id: 0,
         tweet_user: {
@@ -50,16 +45,34 @@ export default {
         },
         tweet_body: "はじめてのツイート",
       }),
-    };
-  },
-  methods: {
-    tweetAction(TweetObj) {
-      this.AllTweet.push(TweetObj);
-      localStorage.setItem(TweetObj.tweet_id,TweetObj);
-      console.log(localStorage);
-    },
-    changeUser(){
-      console.log('A')
+      tweet_user: {
+        user_id: "TestId",
+        user_name: "ユーザー",
+      },
+    })
+
+    const tweetAction = (TweetObj) => {
+      data.AllTweet.push(TweetObj);
+      localStorage.setItem(
+        JSON.stringify(TweetObj.tweet_id),
+        JSON.stringify(TweetObj)
+      );
+      console.log(localStorage)
+    }
+
+    const selectUser = (user) => {
+      console.log(user)
+      data.tweet_user = user;
+    }
+
+    for (let i = 1; i < parseInt(localStorage.getItem("last_id")) + 1; i++) {
+      data.AllTweet.push(JSON.parse(localStorage.getItem(i)));
+    }
+
+    return {
+      data,
+      tweetAction,
+      selectUser
     }
   },
 };
@@ -69,11 +82,7 @@ export default {
   display: flex;
   margin: 20px auto;
 }
-.menu {
-  width: 20%;
-  margin: 30px;
-  border:1px solid green;
-}
+
 .tweet-content {
   width: 60%;
 }
